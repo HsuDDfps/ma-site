@@ -522,7 +522,6 @@
             border-color: rgba(255,255,255,0.3);
         }
 
-        /* 強化 Footer Credits 顯示層級 */
         .footer-credits {
             position: relative;
             z-index: 100;
@@ -534,10 +533,17 @@
             display: block;
         }
 
-        .footer-credits span { 
+        .footer-credits a { 
             color: var(--primary-color); 
             font-weight: 700; 
             text-shadow: 0 0 10px var(--accent-glow);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer-credits a:hover {
+            color: #ffffff;
+            text-shadow: 0 0 15px var(--primary-color);
         }
 
         #back-to-top {
@@ -779,7 +785,7 @@
             <p style="color: var(--text-sub); margin-top: 25px; font-weight: 300; font-size: 0.9rem;">© 2026 Ma. All rights reserved.</p>
             
             <div class="footer-credits" data-aos="fade-up">
-                This website was deployed with assistance from <span>MiloTW</span>
+                This website was deployed with assistance from <a href="https://www.instagram.com/milo._.tw/" target="_blank" rel="noopener noreferrer">MiloTW</a>
             </div>
         </div>
     </footer>
