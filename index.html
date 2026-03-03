@@ -13,11 +13,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <style>
+        /* 基礎優化：移除平滑捲動以降低 CPU 負擔 */
         html {
-            scroll-behavior: smooth;
+            scroll-behavior: auto;
         }
 
         ::-webkit-scrollbar {
@@ -39,7 +39,7 @@
             --bg-dark: #0a0a0a;
             --text-main: #ffffff;
             --text-sub: rgba(255, 255, 255, 0.7);
-            --glass: rgba(255, 255, 255, 0.08);
+            --glass: rgba(255, 255, 255, 0.05);
             --nav-bg: rgba(10, 10, 10, 0.95);
             --accent-glow: rgba(0, 122, 255, 0.3);
         }
@@ -53,45 +53,13 @@
 
         body {
             background-color: var(--bg-dark);
+            /* 改用靜態漸層取代動態 Blob 效果 */
+            background-image: radial-gradient(circle at 0% 0%, rgba(0, 122, 255, 0.05) 0%, transparent 50%),
+                              radial-gradient(circle at 100% 100%, rgba(0, 122, 255, 0.02) 0%, transparent 50%);
+            background-attachment: fixed;
             color: var(--text-main);
             line-height: 1.6;
             overflow-x: hidden;
-            /* 最佳化文字渲染效能 */
-            text-rendering: optimizeSpeed;
-        }
-
-        .background-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #050505;
-            z-index: -1;
-            overflow: hidden;
-            /* 禁止背景元素捕捉滑鼠事件以提升效能 */
-            pointer-events: none;
-        }
-
-        .blob {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(0, 122, 255, 0.1) 0%, rgba(0, 122, 255, 0) 70%);
-            border-radius: 50%;
-            /* 降低模糊半徑以減輕 GPU 負擔 */
-            filter: blur(50px);
-            animation: move 25s infinite alternate linear;
-            will-change: transform;
-        }
-
-        .blob-1 { top: -10%; left: -10%; }
-        .blob-2 { bottom: -10%; right: -10%; background: radial-gradient(circle, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 70%); animation-delay: -5s; }
-        .blob-3 { top: 40%; left: 60%; background: radial-gradient(circle, rgba(0, 122, 255, 0.05) 0%, rgba(0, 122, 255, 0) 70%); animation-delay: -2s; }
-
-        @keyframes move {
-            from { transform: translate3d(0, 0, 0); }
-            to { transform: translate3d(80px, 80px, 0); }
         }
 
         .container {
@@ -102,6 +70,7 @@
             z-index: 1;
         }
 
+        /* Navbar 優化 */
         .navbar {
             position: fixed;
             top: 0;
@@ -109,7 +78,6 @@
             z-index: 1000;
             background: var(--nav-bg);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            /* 移除效能殺手 backdrop-filter */
         }
 
         .navbar .container {
@@ -126,6 +94,11 @@
             color: #fff;
             letter-spacing: 3px;
             text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .logo:hover {
+            color: var(--primary-color);
         }
 
         .logo span { color: var(--primary-color); }
@@ -141,16 +114,29 @@
             text-decoration: none;
             color: var(--text-sub);
             font-size: 0.95rem;
-            transition: color 0.3s;
+            transition: 0.3s;
             position: relative;
             font-weight: 500;
         }
 
         .nav-links a:hover { color: var(--text-main); }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: 0.2s ease;
+        }
+        .nav-links a:hover::after { width: 100%; }
 
+        /* Hero Section */
         .hero {
-            padding: 200px 0 100px 0;
-            min-height: 95vh;
+            padding: 160px 0 100px 0;
+            min-height: 80vh;
             display: flex;
             align-items: center;
         }
@@ -162,11 +148,22 @@
             align-items: center;
         }
 
+        .greeting {
+            color: var(--primary-color);
+            font-weight: 600;
+            letter-spacing: 3px;
+            display: block;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
         .hero-text h1 {
             font-size: 5rem;
             margin-bottom: 20px;
             font-weight: 700;
-            line-height: 1.1;
+            line-height: 1;
+            letter-spacing: -2px;
         }
 
         .description {
@@ -174,6 +171,8 @@
             margin-bottom: 40px;
             color: var(--text-sub);
             max-width: 550px;
+            line-height: 1.8;
+            font-weight: 300;
         }
 
         .avatar-wrapper {
@@ -182,25 +181,30 @@
             height: 340px;
             border-radius: 40px;
             overflow: hidden;
-            transform: translate3d(0,0,0) rotate(3deg);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            will-change: transform;
+            transition: 0.3s ease;
         }
 
-        .section { padding: 120px 0; }
+        .avatar-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .section { padding: 100px 0; }
 
         .section-header {
             text-align: center;
-            margin-bottom: 80px;
+            margin-bottom: 60px;
         }
 
         .section-title {
-            font-size: 2.8rem;
+            font-size: 2.5rem;
             font-weight: 700;
             position: relative;
             display: inline-block;
-            padding-bottom: 20px;
+            padding-bottom: 15px;
         }
 
         .section-title::after {
@@ -215,30 +219,38 @@
             border-radius: 10px;
         }
 
+        /* Flickr Grid */
         .flickr-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 25px;
+            width: 100%;
         }
 
         .flickr-card {
             display: flex;
             flex-direction: column;
             gap: 15px;
+            transition: 0.3s ease;
         }
 
         .flickr-item {
-            background: #151515;
+            background: var(--glass);
             border-radius: 20px;
             padding: 12px;
             border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: transform 0.3s ease, border-color 0.3s;
-            will-change: transform;
+            transition: 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .flickr-card:hover {
+            transform: translateY(-5px);
         }
 
         .flickr-card:hover .flickr-item {
             border-color: var(--primary-color);
-            transform: translate3d(0, -5px, 0);
         }
 
         .flickr-item img {
@@ -249,6 +261,9 @@
 
         .flickr-meta {
             padding: 0 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
         .model-tag {
@@ -256,112 +271,191 @@
             font-weight: 600;
             color: var(--primary-color);
             text-decoration: none;
+            transition: 0.3s;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
+        .model-tag:hover { color: #fff; }
+
         .location-tag {
             font-size: 0.8rem;
             color: var(--text-sub);
-            margin-top: 5px;
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
+        .view-more-container {
+            text-align: center;
+            width: 100%;
+            margin-top: 50px;
+        }
+
+        .btn-view-more {
+            display: inline-block;
+            padding: 15px 40px;
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s ease;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .btn-view-more:hover {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        /* Tools Grid */
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 25px;
+            margin-bottom: 50px;
         }
 
         .tool-card {
-            background: #111;
+            background: var(--glass);
             padding: 40px;
             border-radius: 24px;
             text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: transform 0.3s;
-            will-change: transform;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .tool-card:hover { transform: translate3d(0, -5px, 0); border-color: var(--primary-color); }
+        .tool-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+        }
 
         .tool-icon-img {
             width: 60px;
             height: 60px;
             margin-bottom: 20px;
+            transition: 0.3s ease;
             object-fit: contain;
         }
 
+        .tool-card h4 { font-size: 1.1rem; margin-bottom: 5px; font-weight: 600; }
+
+        /* Gear Cards */
         .gear-group { margin-bottom: 50px; }
 
         .gear-category-title {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--primary-color);
+            letter-spacing: 2px;
+            text-transform: uppercase;
             margin-bottom: 20px;
-            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
+            font-weight: 600;
+        }
+
+        .gear-category-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(0, 122, 255, 0.2);
         }
 
         .gear-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            gap: 15px;
         }
 
         .gear-card {
-            background: #111;
+            background: var(--glass);
             padding: 20px;
             border-radius: 18px;
             border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: 0.3s ease;
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
+        .gear-card:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.02);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
         .gear-icon {
             width: 45px;
             height: 45px;
+            min-width: 45px;
             background: rgba(0, 122, 255, 0.1);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--primary-color);
+            font-size: 1.1rem;
         }
 
+        .gear-info h4 { font-size: 0.95rem; color: #fff; margin-bottom: 2px; font-weight: 600; }
+        .gear-info span { font-size: 0.75rem; color: var(--text-sub); line-height: 1.4; }
+
+        /* Footer & Social */
         .footer {
-            padding: 100px 0 60px;
+            padding: 80px 0 40px;
             text-align: center;
-            background: #000;
+            background: #050505;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 35px;
         }
 
         .social-btn {
             width: 55px;
             height: 55px;
-            background: #111;
-            border-radius: 18px;
-            display: inline-flex;
+            background: var(--glass);
+            border-radius: 15px;
+            display: flex;
             align-items: center;
             justify-content: center;
             color: #fff;
             text-decoration: none;
-            margin: 0 10px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 1.3rem;
             transition: 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .social-btn:hover { background: var(--primary-color); transform: translate3d(0, -5px, 0); }
+        .social-btn:hover {
+            background: var(--primary-color);
+            transform: translateY(-5px);
+        }
 
         .footer-credits {
-            margin-top: 40px;
-            font-size: 0.9rem;
-            color: #fff;
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: var(--text-sub);
         }
 
-        .footer-credits a { color: var(--primary-color); font-weight: 700; text-decoration: none; }
+        .footer-credits a { 
+            color: var(--primary-color); 
+            text-decoration: none;
+            font-weight: 600;
+        }
 
         #back-to-top {
             position: fixed;
@@ -378,12 +472,11 @@
             cursor: pointer;
             z-index: 2000;
             opacity: 0;
-            visibility: hidden;
             transition: 0.3s;
             border: none;
         }
 
-        #back-to-top.show { opacity: 1; visibility: visible; }
+        #back-to-top.show { opacity: 1; }
 
         @media (max-width: 992px) {
             .flickr-grid, .tools-grid { grid-template-columns: repeat(2, 1fr); }
@@ -391,19 +484,14 @@
 
         @media (max-width: 768px) {
             .hero-content { grid-template-columns: 1fr; text-align: center; }
-            .hero-text h1 { font-size: 3rem; }
-            .avatar-wrapper { margin: 0 auto; width: 280px; height: 280px; }
+            .hero-text h1 { font-size: 3.5rem; }
+            .avatar-wrapper { margin: 0 auto; width: 260px; height: 260px; }
+            .nav-links { display: none; }
             .flickr-grid, .tools-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="background-animation">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-    </div>
-
     <nav class="navbar">
         <div class="container">
             <a href="#" class="logo">Ma<span>.</span></a>
@@ -419,15 +507,20 @@
 
     <header id="about" class="hero">
         <div class="container hero-content">
-            <div class="hero-text" data-aos="fade-right">
+            <div class="hero-text">
                 <span class="greeting">Professional Photography</span>
                 <h1>Ma</h1>
-                <p class="description">專注於捕捉純粹的光影與構圖，致力於將每一瞬的永恆凝結為視覺藝術。</p>
-                <a href="#contact" style="padding: 16px 36px; background: var(--primary-color); color: white; border-radius: 12px; text-decoration: none; font-weight: 600; display: inline-block;">立即預約拍攝</a>
+                <p class="description">
+                    專注於捕捉純粹的光影與構圖，<br>
+                    致力於將每一瞬的永恆凝結為視覺藝術。
+                </p>
+                <div class="cta-buttons">
+                    <a href="#contact" style="padding: 14px 32px; background: var(--primary-color); color: white; border-radius: 12px; text-decoration: none; font-weight: 600; display: inline-block; transition: 0.3s;">立即預約拍攝</a>
+                </div>
             </div>
-            <div class="hero-image" data-aos="fade-left">
+            <div class="hero-image">
                 <div class="avatar-wrapper">
-                    <img src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=800&q=80" alt="Ma" style="width:100%; height:100%; object-fit:cover;">
+                    <img src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=800&q=80" alt="Ma">
                 </div>
             </div>
         </div>
@@ -435,58 +528,70 @@
 
     <section id="portfolio" class="section">
         <div class="container">
-            <div class="section-header" data-aos="fade-up">
+            <div class="section-header">
                 <h2 class="section-title">攝影作品集</h2>
             </div>
             
             <div class="flickr-grid">
-                <div class="flickr-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="flickr-card">
                     <div class="flickr-item">
-                        <a data-flickr-embed="true" target="_blank" rel="noopener noreferrer" href="https://www.flickr.com/photos/204370639@N08/55126357681/"><img src="https://live.staticflickr.com/65535/55126357681_9d900a53bd.jpg" alt="Phoenix"/></a>
+                        <a data-flickr-embed="true" target="_blank" rel="noopener noreferrer" href="https://www.flickr.com/photos/204370639@N08/55126357681/" title="VALORANT_Wallpaper_Phoenix"><img src="https://live.staticflickr.com/65535/55126357681_9d900a53bd.jpg" width="500" height="281" alt="VALORANT_Wallpaper_Phoenix"/></a>
                     </div>
                     <div class="flickr-meta">
-                        <a href="https://www.instagram.com/milo._.tw/" target="_blank" rel="noopener noreferrer" class="model-tag"><i class="fab fa-instagram"></i> milo._.tw</a>
+                        <a href="https://www.instagram.com/milo._.tw/" target="_blank" class="model-tag"><i class="fab fa-instagram"></i> milo._.tw</a>
                         <span class="location-tag"><i class="fas fa-map-marker-alt"></i> 開拓動漫祭FF46 @ 花博爭豔館</span>
                     </div>
                 </div>
-                <div class="flickr-card" data-aos="fade-up" data-aos-delay="200">
+
+                <div class="flickr-card">
                     <div class="flickr-item">
-                        <a data-flickr-embed="true" target="_blank" rel="noopener noreferrer" href="https://www.flickr.com/photos/204370639@N08/55126551033/"><img src="https://live.staticflickr.com/65535/55126551033_a9fd4e977c.jpg" alt="BrimKAYO"/></a>
+                        <a data-flickr-embed="true" target="_blank" rel="noopener noreferrer" href="https://www.flickr.com/photos/204370639@N08/55126551033/" title="VALORANT_Wallpaper_BrimKAYO"><img src="https://live.staticflickr.com/65535/55126551033_a9fd4e977c.jpg" width="500" height="281" alt="VALORANT_Wallpaper_BrimKAYO"/></a>
                     </div>
                     <div class="flickr-meta">
-                        <a href="https://www.instagram.com/milo._.tw/" target="_blank" rel="noopener noreferrer" class="model-tag"><i class="fab fa-instagram"></i> milo._.tw</a>
+                        <a href="https://www.instagram.com/milo._.tw/" target="_blank" class="model-tag"><i class="fab fa-instagram"></i> milo._.tw</a>
                         <span class="location-tag"><i class="fas fa-map-marker-alt"></i> 開拓動漫祭FF46 @ 花博爭豔館</span>
                     </div>
                 </div>
-                <div class="flickr-card" data-aos="fade-up" data-aos-delay="300">
+
+                <div class="flickr-card">
                     <div class="flickr-item">
-                        <a data-flickr-embed="true" target="_blank" rel="noopener noreferrer" href="https://www.flickr.com/photos/204370639@N08/55126364401/"><img src="https://live.staticflickr.com/65535/55126364401_6ec4d1dccd.jpg" alt="Reyna"/></a>
+                        <a data-flickr-embed="true" target="_blank" rel="noopener noreferrer" href="https://www.flickr.com/photos/204370639@N08/55126364401/" title="VALORANT_Wallpaper_Reyna"><img src="https://live.staticflickr.com/65535/55126364401_6ec4d1dccd.jpg" width="500" height="281" alt="VALORANT_Wallpaper_Reyna"/></a>
                     </div>
                     <div class="flickr-meta">
-                        <a href="https://www.instagram.com/milo._.tw/" target="_blank" rel="noopener noreferrer" class="model-tag"><i class="fab fa-instagram"></i> milo._.tw</a>
+                        <a href="https://www.instagram.com/milo._.tw/" target="_blank" class="model-tag"><i class="fab fa-instagram"></i> milo._.tw</a>
                         <span class="location-tag"><i class="fas fa-map-marker-alt"></i> 開拓動漫祭FF46 @ 花博爭豔館</span>
                     </div>
                 </div>
             </div>
+
             <script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+
+            <div class="view-more-container">
+                <a href="https://www.flickr.com/photos/204370639@N08/" target="_blank" class="btn-view-more">查看更多 Flickr 作品集</a>
+            </div>
         </div>
     </section>
 
     <section id="tools" class="section">
         <div class="container">
-            <div class="section-header" data-aos="fade-up"><h2 class="section-title">精通工具</h2></div>
+            <div class="section-header">
+                <h2 class="section-title">精通工具</h2>
+            </div>
             <div class="tools-grid">
-                <div class="tool-card" data-aos="zoom-in" data-aos-delay="100">
-                    <img src="https://cdn.hsuddfps.com/icon_Adobe_Photoshop.png" class="tool-icon-img">
+                <div class="tool-card">
+                    <img src="https://cdn.hsuddfps.com/icon_Adobe_Photoshop.png" alt="Photoshop" class="tool-icon-img">
                     <h4>Adobe Photoshop</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-sub);">影像合成與修圖</p>
                 </div>
-                <div class="tool-card" data-aos="zoom-in" data-aos-delay="200">
-                    <img src="https://cdn.hsuddfps.com/icon_Adobe_LigjtroomClassic.png" class="tool-icon-img">
+                <div class="tool-card">
+                    <img src="https://cdn.hsuddfps.com/icon_Adobe_LigjtroomClassic.png" alt="Lightroom Classic" class="tool-icon-img">
                     <h4>Lightroom Classic</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-sub);">色彩科學與後製</p>
                 </div>
-                <div class="tool-card" data-aos="zoom-in" data-aos-delay="300">
-                    <img src="https://cdn.hsuddfps.com/icon_DaVinci_Resolve.png" class="tool-icon-img">
+                <div class="tool-card">
+                    <img src="https://cdn.hsuddfps.com/icon_DaVinci_Resolve.png" alt="DaVinci Resolve" class="tool-icon-img">
                     <h4>DaVinci Resolve</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-sub);">影視調色與剪輯</p>
                 </div>
             </div>
         </div>
@@ -494,13 +599,16 @@
 
     <section id="gear" class="section">
         <div class="container">
-            <div class="section-header" data-aos="fade-up"><h2 class="section-title">攝影器材清單</h2></div>
+            <div class="section-header">
+                <h2 class="section-title">攝影器材清單</h2>
+            </div>
+            
             <div class="gear-group">
                 <div class="gear-category-title">Cameras / 機身</div>
                 <div class="gear-grid">
                     <div class="gear-card">
                         <div class="gear-icon"><i class="fas fa-camera"></i></div>
-                        <div class="gear-info"><h4>Sony α7R V</h4><span>6100萬畫素全片幅解析</span></div>
+                        <div class="gear-info"><h4>Sony α7R V</h4><span>6100萬畫素高解析機皇</span></div>
                     </div>
                     <div class="gear-card">
                         <div class="gear-icon"><i class="fas fa-video"></i></div>
@@ -508,6 +616,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="gear-group">
                 <div class="gear-category-title">Lenses / 鏡頭</div>
                 <div class="gear-grid">
@@ -517,7 +626,7 @@
                     </div>
                     <div class="gear-card">
                         <div class="gear-icon"><i class="fas fa-circle-notch"></i></div>
-                        <div class="gear-info"><h4>SEL85F14GM2</h4><span>二代人像定焦鏡皇</span></div>
+                        <div class="gear-info"><h4>SEL85F14GM2</h4><span>二代人像大光圈鏡皇</span></div>
                     </div>
                 </div>
             </div>
@@ -527,25 +636,32 @@
     <footer id="contact" class="footer">
         <div class="container">
             <div class="social-links">
-                <a href="https://www.instagram.com/milo._.tw/" target="_blank" rel="noopener noreferrer" class="social-btn"><i class="fab fa-instagram"></i></a>
-                <a href="https://discord.com/" target="_blank" rel="noopener noreferrer" class="social-btn"><i class="fab fa-discord"></i></a>
+                <a href="https://www.instagram.com/milo._.tw/" target="_blank" class="social-btn"><i class="fab fa-instagram"></i></a>
+                <a href="mailto:your-email@example.com" class="social-btn"><i class="fas fa-envelope"></i></a>
             </div>
-            <p style="color: var(--text-sub); margin-top: 25px;">© 2026 Ma. All rights reserved.</p>
-            <div class="footer-credits">This website was deployed with assistance from <a href="https://www.instagram.com/milo._.tw/" target="_blank" rel="noopener noreferrer">MiloTW</a></div>
+            <p style="color: var(--text-sub); font-size: 0.85rem;">© 2026 Ma. All rights reserved.</p>
+            <div class="footer-credits">
+                Deployed with assistance from <a href="https://www.instagram.com/milo._.tw/" target="_blank">MiloTW</a>
+            </div>
         </div>
     </footer>
 
     <button id="back-to-top"><i class="fas fa-chevron-up"></i></button>
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        AOS.init({ duration: 800, once: true });
+        // 僅保留必要的返回頂部功能
         const bttBtn = document.getElementById('back-to-top');
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 500) bttBtn.classList.add('show');
-            else bttBtn.classList.remove('show');
+            if (window.scrollY > 500) {
+                bttBtn.style.opacity = "1";
+            } else {
+                bttBtn.style.opacity = "0";
+            }
         });
-        bttBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+        bttBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        });
     </script>
 </body>
 </html>
