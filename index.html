@@ -486,9 +486,9 @@
         .gear-info span { font-size: 0.8rem; color: var(--text-sub); line-height: 1.4; display: block; }
 
         .footer {
-            padding: 120px 0 40px;
+            padding: 120px 0 60px;
             text-align: center;
-            background: linear-gradient(to top, #000, transparent);
+            background: linear-gradient(to top, #000 0%, transparent 100%);
             position: relative;
             z-index: 10;
         }
@@ -522,16 +522,23 @@
             border-color: rgba(255,255,255,0.3);
         }
 
+        /* 強化 Footer Credits 顯示層級 */
         .footer-credits {
-            margin-top: 30px;
-            font-size: 0.8rem;
-            color: var(--text-sub);
-            opacity: 0.6;
-            font-weight: 300;
+            position: relative;
+            z-index: 100;
+            margin-top: 40px;
+            font-size: 0.9rem;
+            color: #ffffff;
+            font-weight: 400;
             letter-spacing: 1px;
+            display: block;
         }
 
-        .footer-credits span { color: var(--primary-color); font-weight: 500; }
+        .footer-credits span { 
+            color: var(--primary-color); 
+            font-weight: 700; 
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
 
         #back-to-top {
             position: fixed;
