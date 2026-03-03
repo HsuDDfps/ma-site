@@ -6,6 +6,8 @@
     <title>Ma Official</title>
     <meta name="description" content="Ma Official - 捕捉光影的藝術與視覺敘事">
     
+    <link rel="icon" href="https://cdn.hsuddfps.com/icon_favicon.png" type="image/png">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -14,12 +16,10 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <style>
-        /* 核心設計語言與平滑捲動 */
         html {
             scroll-behavior: smooth;
         }
 
-        /* 自定義捲軸 UX 強化 */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -58,7 +58,6 @@
             overflow-x: hidden;
         }
 
-        /* --- 進階動態漸層背景 --- */
         .background-animation {
             position: fixed;
             top: 0;
@@ -98,7 +97,6 @@
             z-index: 1;
         }
 
-        /* --- 導覽列 Navbar --- */
         .navbar {
             position: fixed;
             top: 0;
@@ -163,7 +161,6 @@
         }
         .nav-links a:hover::after { width: 100%; }
 
-        /* --- 主視覺 Hero --- */
         .hero {
             padding: 200px 0 100px 0;
             min-height: 95vh;
@@ -228,7 +225,6 @@
             object-fit: cover;
         }
 
-        /* --- 大標題設計 --- */
         .section { padding: 140px 0; }
 
         .section-header {
@@ -275,7 +271,6 @@
             pointer-events: none;
         }
 
-        /* --- 攝影作品集 (Flickr 三欄並排 & 標註優化) --- */
         .flickr-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -314,7 +309,6 @@
             border-radius: 10px;
         }
 
-        /* 作品細節標註樣式 */
         .flickr-meta {
             padding: 0 5px;
             display: flex;
@@ -378,7 +372,6 @@
             transform: translateY(-5px);
         }
 
-        /* --- 精通工具 Tools Section --- */
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -422,7 +415,6 @@
 
         .tool-card h4 { font-size: 1.2rem; margin-bottom: 5px; font-weight: 600; }
 
-        /* --- 攝影器材清單 --- */
         .gear-group {
             margin-bottom: 60px;
         }
@@ -493,7 +485,6 @@
         .gear-info h4 { font-size: 1rem; color: #fff; margin-bottom: 4px; font-weight: 600; }
         .gear-info span { font-size: 0.8rem; color: var(--text-sub); line-height: 1.4; display: block; }
 
-        /* --- 頁尾 Footer --- */
         .footer {
             padding: 120px 0 40px;
             text-align: center;
@@ -542,6 +533,37 @@
 
         .footer-credits span { color: var(--primary-color); font-weight: 500; }
 
+        #back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px var(--accent-glow);
+            border: none;
+        }
+
+        #back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #back-to-top:hover {
+            transform: translateY(-5px) scale(1.1);
+        }
+
         @media (max-width: 992px) {
             .flickr-grid { grid-template-columns: repeat(2, 1fr); }
             .tools-grid { grid-template-columns: repeat(2, 1fr); }
@@ -555,6 +577,7 @@
             .section-header::before { font-size: 3.5rem; }
             .flickr-grid { grid-template-columns: 1fr; }
             .tools-grid { grid-template-columns: 1fr; }
+            #back-to-top { bottom: 20px; right: 20px; }
         }
     </style>
 </head>
@@ -754,6 +777,8 @@
         </div>
     </footer>
 
+    <button id="back-to-top" title="返回頂部"><i class="fas fa-chevron-up"></i></button>
+
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         AOS.init({
@@ -763,7 +788,6 @@
             easing: 'ease-out-cubic'
         });
 
-        // 平滑滾動效果
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -773,6 +797,22 @@
                         behavior: 'smooth'
                     });
                 }
+            });
+        });
+
+        const bttBtn = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 500) {
+                bttBtn.classList.add('show');
+            } else {
+                bttBtn.classList.remove('show');
+            }
+        });
+
+        bttBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
             });
         });
     </script>
